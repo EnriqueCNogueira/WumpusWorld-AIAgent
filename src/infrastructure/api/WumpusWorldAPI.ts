@@ -1,23 +1,28 @@
 import { GameEngine } from '../../application/engine/GameEngine';
 import { IObserver } from '../../domain/interfaces/IObserver';
 import { PerceptionType } from '../../domain/types/PerceptionType';
+import { MovementService } from '../../application/actions/MovementService';
+import { ShootingService } from '../../application/actions/ShootingService'; // Adicionar
+import { InteractionService } from '../../application/actions/InteractionService';
 
 export class WumpusWorldAPI implements IObserver {
   private engine: GameEngine;
+  private movementService: MovementService;
+  private shootingService: ShootingService; // Adicionar
   private currentPerceptions: Set<PerceptionType> = new Set();
+  private interactionService: InteractionService;
 
   constructor() {
     this.engine = GameEngine.getInstance();
-    // A API se inscreve no sistema para repassar os dados ao cliente "cego"
+    this.movementService = new MovementService(this.engine);
+    this.shootingService = new ShootingService(this.engine); // Inicializar
     this.engine.perceptionSystem.addObserver(this);
+    this.interactionService = new InteractionService(this.engine);
   }
 
-  // Contrato do IObserver
   public onPerceptionUpdate(perceptions: Set<PerceptionType>): void {
     this.currentPerceptions = perceptions;
   }
-
-  // --- Contratos Públicos da Facade ---
 
   public getPerceptions(): PerceptionType[] {
     return Array.from(this.currentPerceptions);
@@ -31,12 +36,19 @@ export class WumpusWorldAPI implements IObserver {
     };
   }
 
-  // Assinaturas de comandos (A lógica de movimentação será injetada no motor na próxima etapa)
   public moveForward(): void {
-    throw new Error('Action mapping not implemented yet.');
+    this.movementService.moveForward();
   }
 
   public shoot(): void {
-    throw new Error('Action mapping not implemented yet.');
+    this.shootingService.shoot();
+  }
+
+  public grabGold(): boolean {
+    return this.interactionService.grabGold();
+  }
+
+  public climb(): boolean {
+    return this.interactionService.climb();
   }
 }
