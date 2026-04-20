@@ -9,17 +9,14 @@ describe('WumpusWorldAPI (Facade Pattern)', () => {
   let engine: GameEngine;
 
   beforeEach(() => {
-    // 1. Reseta o Singleton global PRIMEIRO, antes de capturar qualquer referência
+    // Reseta o Singleton para evitar Stale Reference
     GameEngine.getInstance().resetStateForTesting();
-    
-    // 2. AGORA capturamos a referência fresca e correta para o teste
     engine = GameEngine.getInstance();
     
-    // 3. Inicializa o estado na referência correta
     const player = new Player('player-1', new Position(0, 0));
     engine.initialize(4, player, []);
     
-    // 4. Instancia a API (que buscará a mesma referência global inicializada acima)
+    // Instancia a Facade vinculada ao motor atual
     api = new WumpusWorldAPI();
   });
 
@@ -40,8 +37,9 @@ describe('WumpusWorldAPI (Facade Pattern)', () => {
     expect(apiPerceptions.length).toBe(2);
   });
 
-  test('Deve lançar erro ao acionar comandos de acao nao implementados', () => {
-    expect(() => api.moveForward()).toThrow('Action mapping not implemented yet.');
-    expect(() => api.shoot()).toThrow('Action mapping not implemented yet.');
+  test('Deve executar ações de movimento e tiro sem lançar erros de implementação', () => {
+    // Valida que os métodos agora estão mapeados corretamente no motor
+    expect(() => api.moveForward()).not.toThrow();
+    expect(() => api.shoot()).not.toThrow();
   });
 });

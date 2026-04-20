@@ -1,27 +1,35 @@
 import { GameEngine } from '../../../src/application/engine/GameEngine';
-import { MovementService } from '../../../src/application/actions/MovementService';
-import { Player } from '../../../src/domain/entities/Player';
-import { Pit } from '../../../src/domain/entities/EnvironmentEntities';
-import { Position } from '../../../src/domain/types/Position';
-import { PerceptionType } from '../../../src/domain/types/PerceptionType';
 import { WumpusWorldAPI } from '../../../src/infrastructure/api/WumpusWorldAPI';
+import { Player } from '../../../src/domain/entities/Player';
+import { Position } from '../../../src/domain/types/Position';
+import { Pit } from '../../../src/domain/entities/EnvironmentEntities';
+import { PerceptionType } from '../../../src/domain/types/PerceptionType';
+import { SensoryService } from '../../../src/application/systems/SensoryService';
 
 describe('Sensory Automation', () => {
-  test('Deve emitir BREEZE ao se aproximar de um poço', () => {
-    const engine = GameEngine.getInstance();
-    engine.resetStateForTesting();
+  let api: WumpusWorldAPI;
+  let engine: GameEngine;
+  let sensory: SensoryService;
+
+  beforeEach(() => {
+    // Reinicialização completa do ambiente de teste
+    GameEngine.getInstance().resetStateForTesting();
+    engine = GameEngine.getInstance();
     
     const player = new Player('p1', new Position(0, 0));
-    const pit = new Pit('pit-1', new Position(0, 1));
+    const pit = new Pit('pit1', new Position(0, 1)); // Adjacente ao player
+    
     engine.initialize(4, player, [pit]);
+    
+    // API deve ser instanciada APÓS o reset para observar o motor correto
+    api = new WumpusWorldAPI();
+    sensory = new SensoryService(engine);
+  });
 
-    const api = new WumpusWorldAPI();
-    const movement = new MovementService(engine);
+  test('Deve emitir BREEZE ao se aproximar de um poço', () => {
+    sensory.updatePerceptions();
 
-    // Jogador está em (0,0), poço em (0,1). Adjacente!
-    // Precisamos de um gatilho de atualização ou movimento
-    (movement as any).sensoryService.updatePerceptions();
-
-    expect(api.getPerceptions()).toContain(PerceptionType.BREEZE);
+    const perceptions = api.getPerceptions();
+    expect(perceptions).toContain(PerceptionType.BREEZE);
   });
 });
