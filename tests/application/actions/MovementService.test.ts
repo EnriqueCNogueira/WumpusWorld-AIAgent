@@ -4,6 +4,7 @@ import { Player } from '../../../src/domain/entities/Player';
 import { Position } from '../../../src/domain/types/Position';
 import { Direction } from '../../../src/domain/types/Direction';
 import { Pit } from '../../../src/domain/entities/EnvironmentEntities';
+import { PerceptionType } from '../../../src/domain/types/PerceptionType';
 
 describe('MovementService', () => {
   let engine: GameEngine;
@@ -36,5 +37,20 @@ describe('MovementService', () => {
     expect(player.isAlive).toBe(true);
     movementService.moveForward(); // Move para (1,0) onde está o poço
     expect(player.isAlive).toBe(false);
+  });
+
+  test('BUMP deve preservar percepções passivas (BREEZE) ao colidir com parede', () => {
+    player.direction = Direction.WEST;
+    const spy = jest.spyOn(engine.perceptionSystem, 'notifyObservers');
+    movementService.moveForward();
+    const lastCall = spy.mock.calls[spy.mock.calls.length - 1][0];
+    expect(lastCall.has(PerceptionType.BUMP)).toBe(true);
+    expect(lastCall.has(PerceptionType.BREEZE)).toBe(true);
+  });
+
+  test('moveTo deve reorientar e mover em uma chamada', () => {
+    movementService.moveTo(Direction.SOUTH);
+    expect(player.direction).toBe(Direction.SOUTH);
+    expect(player.position.equals(new Position(0, 1))).toBe(true);
   });
 });

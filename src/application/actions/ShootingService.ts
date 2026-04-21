@@ -3,15 +3,20 @@ import { PerceptionType } from '../../domain/types/PerceptionType';
 import { EntityType } from '../../domain/types/EntityType';
 import { Wumpus } from '../../domain/entities/EnvironmentEntities';
 import { SensoryService } from '../systems/SensoryService';
+import { Direction } from '../../domain/types/Direction';
 
 export class ShootingService {
   constructor(private engine: GameEngine) {}
 
-  public shoot(): boolean {
+  public shoot(direction?: Direction): boolean {
     const player = this.engine.player;
 
     if (!player.isAlive || player.arrows <= 0) {
       return false;
+    }
+
+    if (direction !== undefined) {
+      player.direction = direction;
     }
 
     player.arrows -= 1;
