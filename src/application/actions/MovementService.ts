@@ -1,7 +1,7 @@
 import { GameEngine } from '../engine/GameEngine';
 import { Position } from '../../domain/types/Position';
 import { Direction } from '../../domain/types/Direction';
-import { PerceptionType } from '../../domain/types/PerceptionType'; // ADICIONE ESTA LINHA
+import { PerceptionType } from '../../domain/types/PerceptionType';
 import { SensoryService } from '../systems/SensoryService';
 
 export class MovementService {
@@ -11,12 +11,25 @@ export class MovementService {
     this.sensoryService = new SensoryService(this.engine);
   }
 
-  public moveForward(): void {
+  // Novo: Método de alto nível para o Agente de IA
+  public moveTo(targetDirection: Direction): boolean {
     const player = this.engine.player;
-    if (!player.isAlive) return;
+    if (!player.isAlive) return false;
+
+    // 1. Ajustar orientação
+    while (player.direction !== targetDirection) {
+      this.turnRight();
+    }
+
+    // 2. Tentar mover
+    return this.moveForward();
+  }
+
+  public moveForward(): boolean {
+    const player = this.engine.player;
+    if (!player.isAlive) return false;
 
     let { x, y } = player.position;
-
     switch (player.direction) {
       case Direction.NORTH: y -= 1; break;
       case Direction.SOUTH: y += 1; break;
@@ -29,11 +42,27 @@ export class MovementService {
     if (this.engine.grid.isWithinBounds(newPosition)) {
       player.position = newPosition;
       this.checkCollisions();
-      this.sensoryService.updatePerceptions(); 
+      this.sensoryService.updatePerceptions();
+      return true;
     } else {
-      // O erro 'Cannot find name' desaparece após a importação acima
       this.engine.perceptionSystem.notifyObservers(new Set([PerceptionType.BUMP]));
+      return false;
     }
+  }
+
+  public turnLeft(): void {
+    const directions = [Direction.NORTH, Direction.WEST, Direction.SOUTH, Direction.EAST];
+    this.rotate(directions);
+  }
+
+  public turnRight(): void {
+    const directions = [Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST];
+    this.rotate(directions);
+  }
+
+  private rotate(order: Direction[]): void {
+    const currentIndex = order.indexOf(this.engine.player.direction);
+    this.engine.player.direction = order[(currentIndex + 1) % 4];
   }
 
   private checkCollisions(): void {

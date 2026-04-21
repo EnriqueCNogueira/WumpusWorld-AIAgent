@@ -6,10 +6,13 @@ import { Wumpus } from '../../domain/entities/EnvironmentEntities';
 export class ShootingService {
   constructor(private engine: GameEngine) {}
 
-  public shoot(): void {
+public shoot(): boolean {
     const player = this.engine.player;
 
-    if (player.arrows <= 0 || !player.isAlive) return;
+    // Se o jogador estiver morto ou sem flechas, a ação falha.
+    if (!player.isAlive || player.arrows <= 0) {
+      return false;
+    }
 
     player.arrows -= 1;
     const hit = this.checkWumpusHit();
@@ -17,6 +20,7 @@ export class ShootingService {
     if (hit) {
       this.engine.perceptionSystem.notifyObservers(new Set([PerceptionType.SCREAM]));
     }
+    return true; // Ação executada com sucesso
   }
 
   private checkWumpusHit(): boolean {
