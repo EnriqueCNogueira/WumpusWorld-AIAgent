@@ -10,7 +10,8 @@
     "test": "jest",
     "build": "tsc",
     "agent": "ts-node agent/index.ts",
-    "play": "ts-node play.ts"
+    "play": "ts-node play.ts",
+    "command": "ts-node command.ts"
   },
   "keywords": [],
   "author": "",
