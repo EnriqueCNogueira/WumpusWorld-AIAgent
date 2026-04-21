@@ -16,6 +16,6 @@
     "skipLibCheck": true,
     "types": ["jest", "node"]
   },
-  "include": ["src/**/*", "tests/**/*", "agent/**/*"],
+  "include": ["src/**/*", "tests/**/*", "agent/**/*", "play.ts", "cli.ts"],
   "exclude": ["node_modules"]
 }
