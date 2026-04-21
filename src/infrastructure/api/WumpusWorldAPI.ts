@@ -13,7 +13,7 @@ export class WumpusWorldAPI implements IObserver {
   private movementService: MovementService;
   private shootingService: ShootingService;
   private interactionService: InteractionService;
-  private historyService: HistoryService; // Novo serviço
+  private historyService: HistoryService;
   private currentPerceptions: Set<PerceptionType> = new Set();
 
   constructor() {
@@ -22,7 +22,6 @@ export class WumpusWorldAPI implements IObserver {
     this.shootingService = new ShootingService(this.engine);
     this.interactionService = new InteractionService(this.engine);
     
-    // Inicializa o serviço de histórico
     this.historyService = new HistoryService(this.engine);
     
     this.engine.perceptionSystem.addObserver(this);
@@ -72,7 +71,6 @@ export class WumpusWorldAPI implements IObserver {
     return Array.from(this.currentPerceptions);
   }
 
-  // Novo método para expor a memória ao Agente
   public getRecentHistory(limit: number = 5): TurnRecord[] {
     return this.historyService.getRecentHistory(limit);
   }
