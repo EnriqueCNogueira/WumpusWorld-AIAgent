@@ -48,6 +48,19 @@ export class MovementService {
       this.engine.perceptionSystem.notifyObservers(new Set([PerceptionType.BUMP]));
       return false;
     }
+
+    if (this.engine.grid.isWithinBounds(newPosition)) {
+      player.position = newPosition;
+      this.checkCollisions();
+      this.sensoryService.updatePerceptions();
+      return true;
+    } else {
+      // Recupera passivos, adiciona o ativo e notifica
+      const perceptions = this.sensoryService.getCurrentPerceptions();
+      perceptions.add(PerceptionType.BUMP);
+      this.engine.perceptionSystem.notifyObservers(perceptions);
+      return false;
+    }
   }
 
   public turnLeft(): void {

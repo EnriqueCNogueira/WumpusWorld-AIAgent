@@ -6,24 +6,25 @@ import { IPosition } from '../../domain/types/Position';
 export class SensoryService {
   constructor(private engine: GameEngine) {}
 
-  public updatePerceptions(): void {
+  public getCurrentPerceptions(): Set<PerceptionType> {
     const playerPos = this.engine.player.position;
     const perceptions = new Set<PerceptionType>();
 
     for (const entity of this.engine.entities) {
-      // Brilho: Mesma casa que o ouro
       if (entity.type === EntityType.GOLD && entity.position.equals(playerPos)) {
         perceptions.add(PerceptionType.GLITTER);
       }
 
-      // Brisa e Fedor: Casas adjacentes (N, S, L, O)
       if (this.isAdjacent(playerPos, entity.position)) {
         if (entity.type === EntityType.PIT) perceptions.add(PerceptionType.BREEZE);
         if (entity.type === EntityType.WUMPUS) perceptions.add(PerceptionType.STENCH);
       }
     }
+    return perceptions;
+  }
 
-    // Notifica todos os observadores (incluindo a Facade)
+  public updatePerceptions(): void {
+    const perceptions = this.getCurrentPerceptions();
     this.engine.perceptionSystem.notifyObservers(perceptions);
   }
 

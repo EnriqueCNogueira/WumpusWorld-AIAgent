@@ -44,8 +44,17 @@ export class GameEngine {
     return this._perceptionSystem;
   }
 
-  // Método utilitário vital para testes unitários
+  // Novo: Limpeza de estado em memória
+  public clear(): void {
+    this._grid = undefined as unknown as Grid;
+    this._player = undefined as unknown as Player;
+    this._entities = [];
+    // Reinicia o sistema de percepções para remover todos os observers antigos
+    this._perceptionSystem = new PerceptionSystem();
+  }
+
+  // Refatorado: Utiliza a limpeza de estado sem quebrar o Singleton
   public resetStateForTesting(): void {
-    GameEngine.instance = new GameEngine();
+    this.clear();
   }
 }

@@ -2,14 +2,14 @@ import { GameEngine } from '../engine/GameEngine';
 import { PerceptionType } from '../../domain/types/PerceptionType';
 import { EntityType } from '../../domain/types/EntityType';
 import { Wumpus } from '../../domain/entities/EnvironmentEntities';
+import { SensoryService } from '../systems/SensoryService';
 
 export class ShootingService {
   constructor(private engine: GameEngine) {}
 
-public shoot(): boolean {
+  public shoot(): boolean {
     const player = this.engine.player;
 
-    // Se o jogador estiver morto ou sem flechas, a ação falha.
     if (!player.isAlive || player.arrows <= 0) {
       return false;
     }
@@ -17,10 +17,16 @@ public shoot(): boolean {
     player.arrows -= 1;
     const hit = this.checkWumpusHit();
 
+    // Recupera percepções do ambiente para não sobrepor
+    const sensoryService = new SensoryService(this.engine);
+    const perceptions = sensoryService.getCurrentPerceptions();
+
     if (hit) {
-      this.engine.perceptionSystem.notifyObservers(new Set([PerceptionType.SCREAM]));
+      perceptions.add(PerceptionType.SCREAM);
     }
-    return true; // Ação executada com sucesso
+    
+    this.engine.perceptionSystem.notifyObservers(perceptions);
+    return true;
   }
 
   private checkWumpusHit(): boolean {

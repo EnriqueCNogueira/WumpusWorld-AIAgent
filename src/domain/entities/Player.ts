@@ -6,6 +6,7 @@ import { Direction } from '../types/Direction';
 export class Player extends Entity {
   public isAlive: boolean = true;
   public hasGold: boolean = false;
+  public isWinner: boolean = false; // Adição do marcador de vitória global
   public arrows: number = 1;
   public direction: Direction = Direction.EAST; // Inicia virado para o Leste
 

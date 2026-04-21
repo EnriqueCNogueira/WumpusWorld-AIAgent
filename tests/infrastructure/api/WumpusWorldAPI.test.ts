@@ -39,7 +39,7 @@ describe('WumpusWorldAPI (Facade Pattern)', () => {
 
   test('Deve executar ações de movimento e tiro sem lançar erros de implementação', () => {
     // Valida que os métodos agora estão mapeados corretamente no motor
-    expect(() => api.moveForward()).not.toThrow();
+    expect(() => api.move('left')).not.toThrow();
     expect(() => api.shoot()).not.toThrow();
   });
 });

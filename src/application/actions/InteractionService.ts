@@ -24,9 +24,13 @@ export class InteractionService {
 
   public climb(): boolean {
     const player = this.engine.player;
+    
+    // Bloqueia a ação se o jogador já estiver morto
+    if (!player.isAlive) return false;
+
     // Regra: Só pode escalar na posição inicial [0,0]
     if (player.position.x === 0 && player.position.y === 0) {
-      console.log("Jogador escapou da caverna!");
+      player.isWinner = true;
       return true;
     }
     return false;
