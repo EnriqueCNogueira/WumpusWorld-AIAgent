@@ -5,10 +5,16 @@ import { SpatialMemory } from './memory';
 
 type DirCmd = 'up' | 'down' | 'left' | 'right';
 
-const DirectionSchema = z.enum(['UP', 'DOWN', 'LEFT', 'RIGHT']);
+// Aceita tanto UP/DOWN/LEFT/RIGHT quanto NORTH/SOUTH/EAST/WEST para tolerar o modelo.
+const DirectionSchema = z.enum(['UP', 'DOWN', 'LEFT', 'RIGHT', 'NORTH', 'SOUTH', 'EAST', 'WEST']);
+
+const CARDINAL_MAP: Record<string, DirCmd> = {
+  UP: 'up', DOWN: 'down', LEFT: 'left', RIGHT: 'right',
+  NORTH: 'up', SOUTH: 'down', WEST: 'left', EAST: 'right'
+};
 
 function normalize(d: z.infer<typeof DirectionSchema>): DirCmd {
-  return d.toLowerCase() as DirCmd;
+  return CARDINAL_MAP[d] ?? (d.toLowerCase() as DirCmd);
 }
 
 function snapshot(api: WumpusWorldAPI) {
