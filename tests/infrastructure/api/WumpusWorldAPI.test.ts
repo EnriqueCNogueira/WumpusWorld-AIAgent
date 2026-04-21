@@ -23,8 +23,10 @@ describe('WumpusWorldAPI (Facade Pattern)', () => {
   test('Deve retornar o estado anonimizado do jogador', () => {
     const state = api.getPlayerState();
     expect(state.isAlive).toBe(true);
+    expect(state.isWinner).toBe(false);
     expect(state.hasGold).toBe(false);
     expect(state.arrows).toBe(1);
+    expect(state.position).toEqual({ x: 0, y: 0 });
   });
 
   test('Deve armazenar e retornar percepcoes capturadas do barramento (Observer)', () => {

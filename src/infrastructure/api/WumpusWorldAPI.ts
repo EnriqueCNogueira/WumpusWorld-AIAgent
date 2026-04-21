@@ -43,9 +43,19 @@ export class WumpusWorldAPI implements IObserver {
     return this.movementService.moveTo(mapping[command]);
   }
 
-  public shoot(): boolean {
-    this.historyService.registerIntent('SHOOT');
-    return this.shootingService.shoot();
+  public shoot(command?: 'up' | 'down' | 'left' | 'right'): boolean {
+    const label = command ? `SHOOT_${command.toUpperCase()}` : 'SHOOT';
+    this.historyService.registerIntent(label);
+    if (command === undefined) {
+      return this.shootingService.shoot();
+    }
+    const mapping: Record<string, Direction> = {
+      'up': Direction.NORTH,
+      'down': Direction.SOUTH,
+      'left': Direction.WEST,
+      'right': Direction.EAST
+    };
+    return this.shootingService.shoot(mapping[command]);
   }
 
   public grabGold(): boolean {
@@ -68,11 +78,14 @@ export class WumpusWorldAPI implements IObserver {
   }
 
   public getPlayerState() {
+    const p = this.engine.player;
     return {
-      isAlive: this.engine.player.isAlive,
-      hasGold: this.engine.player.hasGold,
-      position: `${this.engine.player.position.x},${this.engine.player.position.y}`,
-      arrows: this.engine.player.arrows
+      isAlive: p.isAlive,
+      isWinner: p.isWinner,
+      hasGold: p.hasGold,
+      position: { x: p.position.x, y: p.position.y },
+      arrows: p.arrows,
+      direction: p.direction
     };
   }
 }

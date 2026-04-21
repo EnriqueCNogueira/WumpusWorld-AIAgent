@@ -1,3 +1,14 @@
 # Dependências
 node_modules/
-# tests/
+
+# Build
+dist/
+
+# Variáveis de ambiente
+.env
+
+# Cobertura de testes
+coverage/
+
+# Logs
+*.log

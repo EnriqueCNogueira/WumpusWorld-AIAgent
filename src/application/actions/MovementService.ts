@@ -11,17 +11,10 @@ export class MovementService {
     this.sensoryService = new SensoryService(this.engine);
   }
 
-  // Novo: Método de alto nível para o Agente de IA
   public moveTo(targetDirection: Direction): boolean {
     const player = this.engine.player;
     if (!player.isAlive) return false;
-
-    // 1. Ajustar orientação
-    while (player.direction !== targetDirection) {
-      this.turnRight();
-    }
-
-    // 2. Tentar mover
+    player.direction = targetDirection;
     return this.moveForward();
   }
 
@@ -44,23 +37,12 @@ export class MovementService {
       this.checkCollisions();
       this.sensoryService.updatePerceptions();
       return true;
-    } else {
-      this.engine.perceptionSystem.notifyObservers(new Set([PerceptionType.BUMP]));
-      return false;
     }
 
-    if (this.engine.grid.isWithinBounds(newPosition)) {
-      player.position = newPosition;
-      this.checkCollisions();
-      this.sensoryService.updatePerceptions();
-      return true;
-    } else {
-      // Recupera passivos, adiciona o ativo e notifica
-      const perceptions = this.sensoryService.getCurrentPerceptions();
-      perceptions.add(PerceptionType.BUMP);
-      this.engine.perceptionSystem.notifyObservers(perceptions);
-      return false;
-    }
+    const perceptions = this.sensoryService.getCurrentPerceptions();
+    perceptions.add(PerceptionType.BUMP);
+    this.engine.perceptionSystem.notifyObservers(perceptions);
+    return false;
   }
 
   public turnLeft(): void {
